@@ -98,20 +98,30 @@ export const App = () => {
         ) : (
           <>
             {!!submittedTerm && (
-              <p className="italic text-2xl py-4">
-                Results of your search:{' '}
+              <p className="italic text-2xl pl-5 py-2 flex gap-1">
+                Search Results:
                 <span className="font-bold">{submittedTerm}</span>
               </p>
             )}
-            {paginated.map((comment) => (
-              <CommentList key={comment.id} comment={comment} />
-            ))}
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
+
+            {paginated.length === 0 && submittedTerm ? (
+              <div className="text-center py-12">
+                <p className="text-xl mb-2">No results found</p>
+                <p className="text-gray-400">Try a different search term</p>
+              </div>
+            ) : (
+              <>
+                {paginated.map((comment) => (
+                  <CommentList key={comment.id} comment={comment} />
+                ))}
+                {totalPages > 1 && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                  />
+                )}
+              </>
             )}
           </>
         )}

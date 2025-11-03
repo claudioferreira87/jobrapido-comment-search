@@ -86,7 +86,7 @@ export const SearchBox = ({
                       type="button"
                       onMouseDown={() => handleSuggestionClick(suggestion)}
                       onKeyDown={() => handleSuggestionClick(suggestion)}
-                      className="w-full text-left"
+                      className="w-full text-left cursor-pointer"
                     >
                       {suggestion}
                     </button>
