@@ -1,40 +1,41 @@
+# Build stage - Node 22 Alpine
 FROM node:22-alpine AS builder
 
 LABEL maintainer="Claudio Ferreira"
 LABEL description="Comment Search - Jobrapido Frontend Test"
 
-# Habilita pnpm via Corepack (built-in Node 22)
+# Enable pnpm via Corepack
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-# Copia arquivos de dependências
+# Copy dependency files
 COPY package.json pnpm-lock.yaml ./
 
-# Instala dependências (--frozen-lockfile = não atualiza lock)
+# Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copia código fonte
+# Copy source code
 COPY . .
 
-# Build para produção
-RUN pnpm run build
+# Build for production
+RUN pnpm build
 
-# Production stage - servidor web
+# Production stage - Nginx Alpine
 FROM nginx:alpine
 
-# Copia arquivos buildados
+# Copy built files
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Config nginx
+# Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Porta
+# Expose port
 EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost:8080 || exit 1
 
-# Start
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]

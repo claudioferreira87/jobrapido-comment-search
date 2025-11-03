@@ -11,13 +11,15 @@ export const CommentListItem = ({ comment }: CommentListItemProps) => {
 
   const tooltipStyle = {
     fontFamily: 'Geist',
-    fontSize: '0.875rem',
+    fontSize: '1.2rem',
+    fontStyle: 'normal',
     borderRadius: '0.5rem',
     maxWidth: '400px',
-    backgroundColor: '#333333',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+    backgroundColor: '#2d2d2d',
+    border: '1px solid #404040',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
     fontWeight: '400',
-    color: '#f0f0f0',
+    color: '#e5e5e5',
     padding: '0.75rem 1rem',
   };
 
