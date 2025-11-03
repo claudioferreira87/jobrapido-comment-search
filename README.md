@@ -1,73 +1,93 @@
-# React + TypeScript + Vite
+# Comment Search - Jobrapido Frontend Test
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React application for searching and browsing comments from JSONPlaceholder API with advanced features like typeahead suggestions and pagination.
 
-Currently, two official plugins are available:
+## 🚀 Technologies
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** + **TypeScript**
+- **Vite** - Build tool
+- **TanStack Query (React Query)** - Data fetching
+- **Tailwind CSS** - Styling
+- **Vitest** + **Testing Library** - Testing (85%+ coverage)
+- **Docker** + **Nginx** - Production deployment
+- **Axios** - HTTP client
+- **Biome** - Linting & Formatting
 
-## React Compiler
+## 📦 Installation
+```bash
+# Install dependencies
+pnpm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# Development server
+pnpm start
 
-## Expanding the ESLint configuration
+# Build for production
+pnpm build
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# Run tests
+pnpm test
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Test coverage
+pnpm test:coverage
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🐳 Docker
+```bash
+# Build and run
+pnpm prod:build
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+# Run existing image
+pnpm prod
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Stop container
+pnpm prod:down
 ```
+
+Access at: `http://localhost:8080`
+
+## ✨ Features
+
+### Core Requirements
+- ✅ Search comments by text (min 3 characters)
+- ✅ Submit-triggered search (not while typing)
+- ✅ Display up to 20 results per page
+- ✅ Show name, email, and truncated body (max 64 chars)
+
+### Bonus Features
+- ✅ **Typeahead** - Autocomplete suggestions
+- ✅ **Pagination** - Navigate through results
+
+## 🎯 Implementation Highlights
+
+- **Client-side filtering** - All comments fetched once, filtered in browser
+- **React Query caching** - Optimized data fetching with 5min cache
+- **Typeahead** - Extracts unique words from comments for suggestions
+- **Pagination** - Client-side slicing of filtered results
+- **Responsive design** - Mobile-friendly interface
+
+## 🔧 Available Scripts
+```bash
+pnpm start          # Start development server
+pnpm build          # Build for production
+pnpm preview        # Preview production build
+pnpm test           # Run tests
+pnpm test:coverage  # Generate coverage report
+pnpm format         # Format code with Biome
+pnpm prod           # Run with Docker Compose
+pnpm prod:build     # Build and run with Docker
+pnpm prod:down      # Stop Docker containers
+```
+
+## 📝 Requirements
+
+- Node.js 22+
+- pnpm 10+
+- Docker (optional, for production deployment)
+
+## 🌐 API
+
+This project uses [JSONPlaceholder](https://jsonplaceholder.typicode.com/comments) - a free fake REST API for testing and prototyping.
+
+---
+
+**Author**: Claudio Ferreira
