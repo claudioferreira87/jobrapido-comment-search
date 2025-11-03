@@ -50,6 +50,7 @@ describe('App', () => {
       </QueryClientProvider>,
     );
 
+    //Select button and verify if it's disabled
     const button = screen.getByRole('button', { name: /Search/i });
     expect(button).toBeDisabled();
   });
@@ -65,10 +66,11 @@ describe('App', () => {
 
     render(<CommentList comment={comment} />);
 
-    // Get rendered body text
+    // Get rendered body text and remove (...)
     const bodyElement = screen.getByText(/qui ipsa animi/i);
     const bodyText = bodyElement.textContent.replace('...', '') || '';
 
+    //Verify if the bodyText it's equal to 64 characters
     expect(bodyText.length).toEqual(64);
   });
 
@@ -118,6 +120,7 @@ describe('App', () => {
       </QueryClientProvider>,
     );
 
+    // Wait to almost one artible shows up, and verify if shows up only 20 articles
     await waitFor(
       () => {
         const items = screen.getAllByRole('article');
@@ -159,6 +162,7 @@ describe('App', () => {
 
     const input = screen.getByPlaceholderText(/Search comments/i);
 
+    // Try to type on input and wait shows the suggestions
     fireEvent.change(input, { target: { value: 'dolor' } });
     fireEvent.focus(input);
 
@@ -202,6 +206,7 @@ describe('App', () => {
     });
   });
 
+  // testing the truncateText function returns a falsy input
   it('returns empty string for falsy input', () => {
     expect(truncateText('', 64)).toBe('');
     expect(truncateText(null as unknown as string, 64)).toBe('');
