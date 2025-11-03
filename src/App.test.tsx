@@ -1,7 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { App } from './App';
+import { App, type CommentsType } from './App';
+import { CommentList } from './components/CommentList';
+import { truncateText } from './components/utils/truncateText';
 
 describe('App', () => {
   it('renders title and search input', async () => {
@@ -52,6 +54,24 @@ describe('App', () => {
     expect(button).toBeDisabled();
   });
 
+  it('truncates body to maximum 64 characters', () => {
+    const comment = {
+      postId: 5,
+      id: 22,
+      name: 'porro repellendus aut tempore quis hic',
+      email: 'Khalil@emile.co.uk',
+      body: 'qui ipsa animi nostrum praesentium voluptatibus odit qui non impedit cum qui nostrum aliquid fuga explicabo voluptatem fugit earum voluptas exercitationem temporibus dignissimos distinctio esse inventore reprehenderit quidem ut incidunt nihil necessitatibus rerum',
+    };
+
+    render(<CommentList comment={comment} />);
+
+    // Get rendered body text
+    const bodyElement = screen.getByText(/qui ipsa animi/i);
+    const bodyText = bodyElement.textContent.replace('...', '') || '';
+
+    expect(bodyText.length).toEqual(64);
+  });
+
   it('allows search with 3+ characters', async () => {
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -81,5 +101,110 @@ describe('App', () => {
 
     // Verify input keeps value
     expect(input).toHaveValue('test');
+  });
+
+  it('shows max 20 results per page', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>,
+    );
+
+    await waitFor(
+      () => {
+        const items = screen.getAllByRole('article');
+        expect(items.length).toBeGreaterThan(0);
+      },
+      { timeout: 3000 },
+    );
+    const items = screen.getAllByRole('article');
+    expect(items.length).toBeLessThanOrEqual(20);
+  });
+
+  it('shows typeahead suggestions', async () => {
+    // Mock API
+    Promise.resolve({
+      ok: true,
+      json: async () =>
+        [
+          {
+            postId: 4,
+            id: 19,
+            name: 'test',
+            email: 'test@test.com',
+            body: 'doloribus est illo sed minima aperiam',
+          },
+        ] as CommentsType[],
+    } as Response);
+
+    const queryClient = new QueryClient();
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText(/Search comments/i)).toBeDefined();
+    });
+
+    const input = screen.getByPlaceholderText(/Search comments/i);
+
+    fireEvent.change(input, { target: { value: 'dolor' } });
+    fireEvent.focus(input);
+
+    const suggestion = await screen.findByText('doloribus');
+    expect(suggestion).toBeDefined();
+  });
+
+  it('navigates between pages', async () => {
+    const queryClient = new QueryClient();
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>,
+    );
+
+    // Wait for data to load
+    await waitFor(() => {
+      expect(screen.getAllByRole('article').length).toBeGreaterThan(0);
+    });
+
+    // Check page 1
+    expect(screen.getByText(/Page 1/i)).toBeDefined();
+
+    // Click Next
+    const nextButton = screen.getByRole('button', { name: /Next/i });
+    fireEvent.click(nextButton);
+
+    // Check page 2
+    await waitFor(() => {
+      expect(screen.getByText(/Page 2/i)).toBeDefined();
+    });
+
+    // Click Previous
+    const prevButton = screen.getByRole('button', { name: /Previous/i });
+    fireEvent.click(prevButton);
+
+    // Back to page 1
+    await waitFor(() => {
+      expect(screen.getByText(/Page 1/i)).toBeDefined();
+    });
+  });
+
+  it('returns empty string for falsy input', () => {
+    expect(truncateText('', 64)).toBe('');
+    expect(truncateText(null as unknown as string, 64)).toBe('');
+    expect(truncateText(undefined as unknown as string, 64)).toBe('');
   });
 });

@@ -1,6 +1,6 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { MessageCircleMore } from 'lucide-react';
-import { type FormEvent, Suspense, useMemo, useState } from 'react';
+import { type FormEvent, useMemo, useState } from 'react';
 import { CommentList } from './components/CommentList';
 import { Pagination } from './components/Pagination';
 import { SearchBox } from './components/SearchBox';
@@ -26,7 +26,7 @@ export const App = () => {
     return data;
   };
 
-  const { data } = useSuspenseQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['comments'],
     queryFn: fetchComments,
   });
@@ -37,7 +37,7 @@ export const App = () => {
     }
 
     const lower = submittedTerm.toLowerCase();
-    return data.filter(
+    return (data || []).filter(
       (comment) =>
         comment.body.toLowerCase().includes(lower) ||
         comment.name.toLowerCase().includes(lower) ||
@@ -93,24 +93,28 @@ export const App = () => {
           setSubmittedTerm={setSubmittedTerm}
         />
 
-        <Suspense fallback={<Loading message="Loading..." />}>
-          {!!submittedTerm && (
-            <p className="italic text-2xl py-5">
-              Results of your search: {submittedTerm}
-            </p>
-          )}
-          {paginated.map((comment) => (
-            <CommentList key={comment.id} comment={comment} />
-          ))}
-
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          )}
-        </Suspense>
+        {isLoading ? (
+          <Loading message="Loading..." />
+        ) : (
+          <>
+            {!!submittedTerm && (
+              <p className="italic text-2xl py-4">
+                Results of your search:{' '}
+                <span className="font-bold">{submittedTerm}</span>
+              </p>
+            )}
+            {paginated.map((comment) => (
+              <CommentList key={comment.id} comment={comment} />
+            ))}
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            )}
+          </>
+        )}
       </main>
     </div>
   );
